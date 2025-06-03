@@ -36,12 +36,12 @@ make
 - WebKit2GTK rendering engine integration
 
 ## Roadmap
-- Basic rendering using WebKit2GTK
-- Basic navigation (back, forward, reload)
-- History and bookmarks system
-- Download manager integration
-- UI/UX enhancements (Safari-inspired)
-- Codebase modularization and cleanup
+- [x] Basic rendering using WebKit2GTK
+- [x] Basic navigation (back, forward, reload)
+- [ ] History and bookmarks system
+- [ ] Download manager integration
+- [ ] UI/UX enhancements (Safari-inspired)
+- [ ] Codebase modularization and cleanup
 
 ## Project Status
 **Development Phase:** 🧪 Active Development
