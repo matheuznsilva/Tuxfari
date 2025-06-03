@@ -1,0 +1,58 @@
+# Compiled object files
+*.o
+
+# Executables
+*.out
+*.exe
+*.out.*
+*.bin
+
+# Build directory
+/build/
+build/
+
+# Logs and debug files
+*.log
+*.stackdump
+
+# Dependency files
+*.d
+
+# Editor/IDE files
+*.swp
+*~
+*.sublime-project
+*.sublime-workspace
+.vscode/
+.idea/
+
+# GTK build files
+*.deps
+*.libs
+*.la
+
+# Autotools and configure scripts
+config.log
+config.status
+Makefile
+Makefile.in
+aclocal.m4
+configure
+compile
+depcomp
+install-sh
+ltmain.sh
+missing
+
+# Backup files
+*#
+
+# macOS Finder files
+.DS_Store
+
+# GTK-Generated Resources
+*.gresource.c
+
+# Ctags and etags
+tags
+TAGS
