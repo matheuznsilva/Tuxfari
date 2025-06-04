@@ -21,8 +21,7 @@ gboolean on_entry_activate(GtkEntry *entry, gpointer user_data) {
     const gchar *text = gtk_entry_get_text(entry);
     gchar *url = format_url(text);
 
-    GtkWidget *page = gtk_notebook_get_nth_page(GTK_NOTEBOOK(notebook),
-                                                gtk_notebook_get_current_page(GTK_NOTEBOOK(notebook)));
+    GtkWidget *page = gtk_notebook_get_nth_page(GTK_NOTEBOOK(notebook), gtk_notebook_get_current_page(GTK_NOTEBOOK(notebook)));
     TabData *data = g_object_get_data(G_OBJECT(page), "tab-data");
     webkit_web_view_load_uri(data->webview, url);
 
@@ -52,16 +51,14 @@ void on_title_changed(WebKitWebView *webview, GParamSpec *pspec, gpointer page) 
 
 // Ações dos botões de navegação
 void on_back_clicked(GtkEventBox *event_box, gpointer user_data) {
-    GtkWidget *page = gtk_notebook_get_nth_page(GTK_NOTEBOOK(notebook),
-                                                gtk_notebook_get_current_page(GTK_NOTEBOOK(notebook)));
+    GtkWidget *page = gtk_notebook_get_nth_page(GTK_NOTEBOOK(notebook), gtk_notebook_get_current_page(GTK_NOTEBOOK(notebook)));
     TabData *data = g_object_get_data(G_OBJECT(page), "tab-data");
     if (webkit_web_view_can_go_back(data->webview))
         webkit_web_view_go_back(data->webview);
 }
 
 void on_forward_clicked(GtkEventBox *event_box, gpointer user_data) {
-    GtkWidget *page = gtk_notebook_get_nth_page(GTK_NOTEBOOK(notebook),
-                                                gtk_notebook_get_current_page(GTK_NOTEBOOK(notebook)));
+    GtkWidget *page = gtk_notebook_get_nth_page(GTK_NOTEBOOK(notebook), gtk_notebook_get_current_page(GTK_NOTEBOOK(notebook)));
     TabData *data = g_object_get_data(G_OBJECT(page), "tab-data");
     if (webkit_web_view_can_go_forward(data->webview))
         webkit_web_view_go_forward(data->webview);
@@ -128,8 +125,7 @@ void on_maximize_clicked(GtkButton *btn, gpointer data) {
 }
 
 void on_reload_clicked(GtkButton *btn, gpointer user_data) {
-    GtkWidget *page = gtk_notebook_get_nth_page(GTK_NOTEBOOK(notebook),
-                                                gtk_notebook_get_current_page(GTK_NOTEBOOK(notebook)));
+    GtkWidget *page = gtk_notebook_get_nth_page(GTK_NOTEBOOK(notebook), gtk_notebook_get_current_page(GTK_NOTEBOOK(notebook)));
     if (page) {
         TabData *data = g_object_get_data(G_OBJECT(page), "tab-data");
         if (data && data->webview) {
@@ -155,6 +151,10 @@ int main(int argc, char *argv[]) {
     gtk_window_set_default_size(GTK_WINDOW(window), 1200, 800);
     gtk_window_set_title(GTK_WINDOW(window), "Tuxfari");
     g_signal_connect(window, "destroy", G_CALLBACK(gtk_main_quit), NULL);
+    
+    // Remove a barra de título e bordas
+    //gtk_window_set_decorated(GTK_WINDOW(window), FALSE);
+
 
     GtkWidget *vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
     gtk_container_add(GTK_CONTAINER(window), vbox);
@@ -165,23 +165,31 @@ int main(int argc, char *argv[]) {
     g_object_set_data(G_OBJECT(window), "topbar", topbar); // usado para atualizar entry
 
     // Botões estilo Safari
-    GtkWidget *ctrl_box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 3);
+    GtkWidget *ctrl_box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 10);
     gtk_box_pack_start(GTK_BOX(topbar), ctrl_box, FALSE, FALSE, 0);
 
-    GtkWidget *btn_close = gtk_button_new(); gtk_widget_set_name(btn_close, "close-button");
-    gtk_widget_set_size_request(btn_close, 5, 5);
+    GtkWidget *btn_close = gtk_button_new();
+    gtk_widget_set_name(btn_close, "close-button");
+    gtk_widget_set_margin_start(btn_close, 15); 
+    gtk_widget_set_size_request(btn_close, 15, 15);
+    gtk_widget_set_valign(btn_close, GTK_ALIGN_CENTER);
     g_signal_connect(btn_close, "clicked", G_CALLBACK(on_close_clicked), NULL);
     gtk_box_pack_start(GTK_BOX(ctrl_box), btn_close, FALSE, FALSE, 0);
 
-    GtkWidget *btn_minimize = gtk_button_new(); gtk_widget_set_name(btn_minimize, "minimize-button");
-    gtk_widget_set_size_request(btn_minimize, 5, 5);
+    GtkWidget *btn_minimize = gtk_button_new();
+    gtk_widget_set_name(btn_minimize, "minimize-button");
+    gtk_widget_set_size_request(btn_minimize, 15, 15);
+    gtk_widget_set_valign(btn_minimize, GTK_ALIGN_CENTER);
     g_signal_connect(btn_minimize, "clicked", G_CALLBACK(on_minimize_clicked), NULL);
     gtk_box_pack_start(GTK_BOX(ctrl_box), btn_minimize, FALSE, FALSE, 0);
 
-    GtkWidget *btn_maximize = gtk_button_new(); gtk_widget_set_name(btn_maximize, "maximize-button");
-    gtk_widget_set_size_request(btn_maximize, 5, 5);
+    GtkWidget *btn_maximize = gtk_button_new();
+    gtk_widget_set_name(btn_maximize, "maximize-button");
+    gtk_widget_set_size_request(btn_maximize, 15, 15);
+    gtk_widget_set_valign(btn_maximize, GTK_ALIGN_CENTER);
     g_signal_connect(btn_maximize, "clicked", G_CALLBACK(on_maximize_clicked), NULL);
     gtk_box_pack_start(GTK_BOX(ctrl_box), btn_maximize, FALSE, FALSE, 0);
+
 
     // Botões < e >
     GtkWidget *btn_back = create_flat_button("<", G_CALLBACK(on_back_clicked));
@@ -190,18 +198,28 @@ int main(int argc, char *argv[]) {
     gtk_box_pack_start(GTK_BOX(topbar), btn_forward, FALSE, FALSE, 5);
 
     // Entrada de URL (compartilhada)
-    GtkWidget *entry_box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
+    GtkWidget *address_reload_box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
+    gtk_widget_set_halign(address_reload_box, GTK_ALIGN_CENTER); // centraliza o conjunto no espaço disponível
+    gtk_widget_set_hexpand(address_reload_box, TRUE);             // para ocupar a largura total
+
+    // Barra de endereço
     GtkWidget *entry_placeholder = gtk_entry_new();
-    gtk_widget_set_hexpand(entry_placeholder, TRUE);
+    gtk_widget_set_size_request(entry_placeholder, 600, -1);
+    gtk_widget_set_hexpand(entry_placeholder, FALSE);
     gtk_editable_set_editable(GTK_EDITABLE(entry_placeholder), TRUE);
-    gtk_box_pack_start(GTK_BOX(entry_box), entry_placeholder, TRUE, TRUE, 0);
+    gtk_box_pack_start(GTK_BOX(address_reload_box), entry_placeholder, FALSE, FALSE, 0);
 
-    // Botão de recarregar 🔄
-    GtkWidget *reload_btn = gtk_button_new_with_label("🔄");
+    // Centraliza o texto
+    gtk_entry_set_alignment(GTK_ENTRY(entry_placeholder), 0.5);
+
+    // Botão reload grudado na barra (sem espaçamento)
+    GtkWidget *reload_btn = create_flat_button("↻", G_CALLBACK(on_reload_clicked));
     gtk_widget_set_name(reload_btn, "reload-button");
-    gtk_box_pack_start(GTK_BOX(entry_box), reload_btn, FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(address_reload_box), reload_btn, FALSE, FALSE, 0);
 
-    gtk_box_pack_start(GTK_BOX(topbar), entry_box, TRUE, TRUE, 5);
+    // Agora adiciona o conjunto address_reload_box no topbar ou onde quiser
+    gtk_box_pack_start(GTK_BOX(topbar), address_reload_box, TRUE, TRUE, 5);
+
 
     // Conecta o sinal Enter à função de navegação
     g_signal_connect(entry_placeholder, "activate", G_CALLBACK(on_entry_activate), NULL);
@@ -214,7 +232,7 @@ int main(int argc, char *argv[]) {
 
     // Botão "+"
     GtkWidget *btn_new_tab = create_flat_button("+", G_CALLBACK(on_new_tab_clicked));
-    gtk_box_pack_start(GTK_BOX(topbar), btn_new_tab, FALSE, FALSE, 15);
+    gtk_box_pack_start(GTK_BOX(topbar), btn_new_tab, FALSE, TRUE, 10);
 
     // Área de abas
     notebook = gtk_notebook_new();
@@ -223,12 +241,13 @@ int main(int argc, char *argv[]) {
     // CSS
     GtkCssProvider *provider = gtk_css_provider_new();
     gtk_css_provider_load_from_data(provider,
-        "#close-button { background: #ff5f57; border-radius: 50%; border: none; padding: 0; }\n"
-        "#minimize-button { background: #ffbd2e; border-radius: 50%; border: none; padding: 0; }\n"
-        "#maximize-button { background: #28c840; border-radius: 50%; border: none; padding: 0; }\n"
-        "#flat-button-label { font: 16px Sans; padding: 6px; }\n"
-        "#tab-close-button { padding: 0; border: none; background: transparent; }",
-        -1, NULL);
+    "#close-button { background: #ff5f57; border-radius: 50%; border: none; padding: 0px; min-width: 5px; min-height: 5px; max-width: 5px; max-height: 5px}\n"
+    "#minimize-button { background: #ffbd2e; border-radius: 50%; border: none; padding: 0; min-width: 5px; min-height: 5px; max-width: 5px; max-height: 5px}\n"
+    "#maximize-button { background: #28c840; border-radius: 50%; border: none; padding: 0; min-width: 5px; min-height: 5px; max-width: 5px; max-height: 5px}\n"
+    "#flat-button-label { font: 16px Sans; padding: 6px; }\n"
+    "#tab-close-button { padding: 0; border: none; background: transparent; }",
+    -1, NULL);
+
     gtk_style_context_add_provider_for_screen(gdk_screen_get_default(), GTK_STYLE_PROVIDER(provider), GTK_STYLE_PROVIDER_PRIORITY_USER);
 
     // Primeira aba
